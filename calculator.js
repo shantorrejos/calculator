@@ -1,21 +1,27 @@
 const masterContainer = document.querySelector('.master-container');
 const btnContainer = document.querySelector('.btn-container');
 const displayContent = document.querySelector('#text-display');
+const decimalButton = document.querySelector('.decimal');
 
 let displayText = '';
 
 let number1 = null;
 let number2 = null;
 let operator;
+let decimal = false;
 
-const add = (a, b) => a + b;
-const subtract = (a, b) => a - b;
-const multiply = (a, b) => a * b;
-const divide = (a, b) => a / b;
-const modulo = (a , b) => a % b;
+const add = (a, b) => Math.round((a + b) * 100) / 100;
+const subtract = (a, b) => Math.round((a - b) * 100) / 100;
+const multiply = (a, b) => Math.round((a * b) * 100) / 100;
+const divide = (a, b) => {
+    if (b === 0){
+        return 0;
+    }
+    return Math.round((a / b) * 100) / 100};
+const modulo = (a , b) => Math.round((a % b) * 100) / 100;
 
 btnContainer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('number')) {
+    if (e.target.classList.contains('number') && !(e.target.classList.contains('decimal'))) {
         updateDisplay(e.target.textContent);
     }
 
@@ -23,10 +29,26 @@ btnContainer.addEventListener('click', (e) => {
         logValues(Number(displayText), e.target.getAttribute('id'));
     }
 
+    if (e.target.classList.contains('decimal') && decimal === false){
+        updateDisplay(e.target.textContent);
+        toggleDecimal(decimalButton);
+    }
+
     if (e.target.classList.contains('clearAll')){
         clearCalc();
     }
 });
+
+function toggleDecimal(){
+    if (decimal === false){
+        decimalButton.style.backgroundColor = '#cccccc'
+        decimal = true;
+    } else {
+        decimalButton.style.backgroundColor = '#fafbff'
+        decimal = false;
+    }
+}
+
 
 function clearCalc() {
     number1 = null;
@@ -34,10 +56,15 @@ function clearCalc() {
     operator = undefined;
     displayText = '';
     displayContent.textContent = '0';
-    console.log('youve reached me');
+    
+    if (decimal === true){
+        toggleDecimal();
+    };
 }
 
 function logValues(value, operation){
+    toggleDecimal(decimalButton);
+
     if (operation === 'equals') {
         number2 = value;
         number1 = operate(number1, number2, operator);
